@@ -1,0 +1,1793 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROCO'S Flow</title>
+  <meta name="theme-color" content="#2f6f5e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --panel: #fff;
+      --ink: #20231f;
+      --muted: #657064;
+      --line: #d9ded5;
+      --green: #246b45;
+      --green-soft: #e5f1e9;
+      --blue: #285f8f;
+      --blue-soft: #e5eef7;
+      --red: #9a423b;
+      --red-soft: #f7e8e6;
+      --amber: #8a6425;
+      --amber-soft: #f5eddc;
+      --shadow: 0 12px 36px rgba(31, 40, 28, .08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+      line-height: 1.5;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; border: 1px solid transparent; }
+
+    .app {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 40px);
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .page-tabs {
+      display: flex;
+      gap: 8px;
+      margin: -6px 0 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .tab-btn {
+      min-height: 58px;
+      border-radius: 8px 8px 0 0;
+      padding: 0 26px;
+      background: transparent;
+      border-color: transparent;
+      border-bottom-color: var(--line);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .tab-btn.active {
+      background: var(--panel);
+      border-color: var(--line);
+      border-bottom-color: var(--panel);
+      color: var(--green);
+      transform: translateY(1px);
+    }
+    .btn {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 0 14px;
+      background: var(--panel);
+      border-color: var(--line);
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .btn.primary {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .btn.danger { color: var(--red); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 370px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .form-panel {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+    }
+    .form-title, .section-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #3e473d;
+    }
+    input, select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px 10px;
+      color: var(--ink);
+    }
+    input:focus, select:focus {
+      outline: 3px solid rgba(36, 107, 69, .18);
+      border-color: var(--green);
+    }
+    .account-badge {
+      min-height: 56px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfa;
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--green);
+    }
+    .amount-input {
+      min-height: 58px;
+      font-size: 26px;
+      font-weight: 700;
+      text-align: right;
+    }
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .form-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .notice {
+      min-height: 22px;
+      margin-top: 10px;
+      color: var(--green);
+      font-size: 13px;
+    }
+    .cloud-status {
+      width: 100%;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+    .hidden {
+      display: none;
+    }
+    .share-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+    .report-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .report-tab {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 0 16px;
+      border-color: var(--line);
+      background: #fff;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .report-tab.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .share-page {
+      display: grid;
+      gap: 18px;
+    }
+    .report-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .report-title h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .report-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+    .report-note {
+      width: 100%;
+      min-height: 112px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      resize: vertical;
+      font: inherit;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .settings-page {
+      display: grid;
+      gap: 18px;
+    }
+    .settings-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .settings-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fbfcfa;
+    }
+
+    .content {
+      display: grid;
+      gap: 18px;
+    }
+    .filters, .summary, .subject-summary, .books { padding: 18px; }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 94px;
+      background: #fbfcfa;
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 22px;
+      word-break: break-word;
+    }
+    .metric.business { border-color: #b9d8c3; background: var(--green-soft); }
+    .metric.welfare { border-color: #bfd1e7; background: var(--blue-soft); }
+    .metric.expense { border-color: #ead0cc; background: var(--red-soft); }
+    .metric.net { border-color: #e4cf9e; background: var(--amber-soft); }
+
+    .subject-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .subject-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fbfcfa;
+    }
+    .subject-card h3 {
+      margin: 0;
+      padding: 10px 12px;
+      font-size: 15px;
+      background: #eef2eb;
+    }
+    .subject-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+    }
+    .subject-row strong {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .month-block {
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+    .month-block:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
+    .month-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .month-head h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .month-total {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+    th {
+      background: #eef2eb;
+      color: #414a3f;
+      font-size: 12px;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tag.business-income { background: var(--green-soft); color: var(--green); }
+    .tag.business-expense { background: var(--red-soft); color: var(--red); }
+    .tag.welfare-income { background: var(--blue-soft); color: var(--blue); }
+    .tag.welfare-expense { background: var(--amber-soft); color: var(--amber); }
+    .row-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border-color: var(--line);
+      background: #fff;
+    }
+    .empty {
+      padding: 36px 18px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #fbfcfa;
+    }
+
+    @media (max-width: 980px) {
+      header, .grid, .filters, .summary-grid, .subject-list, .settings-grid, .settings-row {
+        grid-template-columns: 1fr;
+      }
+      header { align-items: flex-start; }
+      .toolbar { justify-content: flex-start; }
+      .form-panel { position: static; }
+      table { min-width: 1080px; }
+      .table-wrap { overflow-x: auto; }
+    }
+    @media (max-width: 560px) {
+      .app {
+        width: min(100% - 20px, 1220px);
+        padding-top: 18px;
+      }
+      .two, .form-actions { grid-template-columns: 1fr; }
+      .metric strong { font-size: 20px; }
+    }
+    @media print {
+      body { background: #fff; }
+      header, .page-tabs, .grid, .settings-page, .share-actions, .no-print { display: none !important; }
+      .app { width: 100%; padding: 0; }
+      .share-page.hidden { display: grid !important; }
+      .panel { box-shadow: none; border: 0; }
+      table { min-width: 0; font-size: 11px; }
+      th, td { padding: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>ROCO'S Flow</h1>
+        <p class="lead">事業会計と福祉会計を分けて、収入・経費・科目別集計まで月ごとに整理します。</p>
+      </div>
+      <div class="toolbar" aria-label="データ操作">
+        <button class="btn" id="importSales" type="button">弁当レジ売上取込</button>
+        <button class="btn" id="importWages" type="button">利用者工賃取込</button>
+        <button class="btn" id="exportCsv" type="button">CSV出力</button>
+        <button class="btn" id="exportJson" type="button">バックアップ</button>
+        <label class="btn" for="importJson">復元</label>
+        <input id="importJson" type="file" accept="application/json" hidden>
+        <span class="cloud-status" id="cloudSettingsStatus">設定はこのパソコンに保存中</span>
+      </div>
+    </header>
+
+    <nav class="page-tabs" aria-label="会計ページ">
+      <button class="tab-btn active" type="button" data-domain-page="business">事業会計</button>
+      <button class="tab-btn" type="button" data-domain-page="welfare">福祉会計</button>
+      <button class="tab-btn" type="button" id="reportPageButton">提出ページ</button>
+      <button class="tab-btn" type="button" id="settingsPageButton">設定</button>
+    </nav>
+
+    <div class="grid" id="ledgerPage">
+      <section class="panel form-panel" aria-label="明細入力">
+        <h2 class="form-title">明細を入力</h2>
+        <form id="entryForm">
+          <input id="entryId" type="hidden">
+          <input id="domain" type="hidden" value="business">
+          <div class="two">
+            <div class="field">
+              <label for="date">日付</label>
+              <input id="date" type="date" required>
+            </div>
+            <div class="field">
+              <label for="flow">種類</label>
+              <select id="flow" required>
+                <option value="income">収入</option>
+                <option value="expense">経費</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="amount">金額</label>
+            <input class="amount-input" id="amount" type="number" min="1" step="1" placeholder="0" required>
+          </div>
+          <div class="field">
+            <label for="subject">科目</label>
+            <select id="subject" required></select>
+          </div>
+          <div class="field">
+            <label for="payee">適用（相手方）</label>
+            <select id="payee"></select>
+          </div>
+          <div class="field" id="customPayeeField">
+            <label for="customPayee">選択肢にない場合</label>
+            <input id="customPayee" type="text" placeholder="相手方を直接入力">
+          </div>
+          <div class="field">
+            <label for="taxRate">消費税</label>
+            <select id="taxRate" required>
+              <option value="10">10％</option>
+              <option value="8">8％</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="memo">メモ</label>
+            <input id="memo" type="text" placeholder="任意">
+          </div>
+          <div class="form-actions">
+            <button class="btn primary" id="saveButton" type="submit">追加する</button>
+            <button class="btn" id="resetForm" type="button">クリア</button>
+          </div>
+          <div class="notice" id="notice" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <div class="content">
+        <section class="panel filters" aria-label="表示条件">
+          <div class="field">
+            <label for="monthFilter">月</label>
+            <select id="monthFilter"></select>
+          </div>
+          <div class="field">
+            <label for="flowFilter">種類</label>
+            <select id="flowFilter">
+              <option value="all">すべて</option>
+              <option value="income">収入</option>
+              <option value="expense">経費</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="subjectFilter">科目</label>
+            <select id="subjectFilter"></select>
+          </div>
+        </section>
+
+        <section class="panel summary" aria-label="集計">
+          <h2 class="section-title">会計別集計</h2>
+          <div class="summary-grid" id="summaryGrid"></div>
+        </section>
+
+        <section class="panel subject-summary" aria-label="科目別集計">
+          <h2 class="section-title">科目別集計</h2>
+          <div class="subject-list" id="subjectSummary"></div>
+        </section>
+
+        <section class="panel books" aria-label="経費帳">
+          <h2 class="section-title">月別経費帳</h2>
+          <div id="books"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="share-page hidden" id="sharePage" aria-label="提出ページ">
+      <div class="report-tabs no-print" aria-label="提出会計">
+        <button class="report-tab active" type="button" data-report-domain="business">事業会計</button>
+        <button class="report-tab" type="button" data-report-domain="welfare">福祉会計</button>
+      </div>
+
+      <div class="panel filters no-print">
+        <div class="field">
+          <label for="reportMonth">提出する月</label>
+          <select id="reportMonth"></select>
+        </div>
+        <div class="field">
+          <label for="taxAccountantEmail">税理士さんのメール</label>
+          <input id="taxAccountantEmail" type="email" placeholder="例: zeirishi@example.com">
+        </div>
+        <div class="field">
+          <label for="reportMemo">送付メモ</label>
+          <input id="reportMemo" type="text" placeholder="例: 今月分の経費帳です。確認お願いします。">
+        </div>
+      </div>
+
+      <section class="panel summary" id="printArea">
+        <div class="report-head">
+          <div class="report-title">
+            <h2>税理士提出用データ</h2>
+            <p id="reportPeriod"></p>
+          </div>
+          <div class="month-total" id="reportCreated"></div>
+        </div>
+        <div class="summary-grid" id="reportSummary"></div>
+        <div id="reportTable"></div>
+      </section>
+
+      <section class="panel summary no-print">
+        <h2 class="section-title">送る・印刷する</h2>
+        <textarea class="report-note" id="shareText" readonly></textarea>
+        <div class="share-actions">
+          <button class="btn primary" id="printReport" type="button">印刷ページを開く</button>
+          <button class="btn" id="emailReport" type="button">メール作成</button>
+          <button class="btn" id="copyLineText" type="button">LINE用テキストコピー</button>
+          <button class="btn" id="exportReportCsv" type="button">提出用CSV出力</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="settings-page hidden" id="settingsPage" aria-label="設定ページ">
+      <section class="panel summary">
+        <h2 class="section-title">科目と相手方の設定</h2>
+        <p class="lead">科目を追加・名前変更・削除できます。相手方は科目ごとに追加・変更できます。</p>
+        <div class="share-actions">
+          <button class="btn" id="exportSettings" type="button">設定バックアップ</button>
+          <label class="btn" for="importSettings">設定復元</label>
+          <input id="importSettings" type="file" accept="application/json" hidden>
+        </div>
+      </section>
+
+      <div class="settings-grid">
+        <section class="panel summary">
+          <h2 class="section-title">科目設定</h2>
+          <div class="two">
+            <div class="field">
+              <label for="settingsDomain">会計</label>
+              <select id="settingsDomain">
+                <option value="business">事業会計</option>
+                <option value="welfare">福祉会計</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="settingsFlow">種類</label>
+              <select id="settingsFlow">
+                <option value="income">収入</option>
+                <option value="expense">経費</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="newSubjectName">追加する科目名</label>
+            <input id="newSubjectName" type="text" placeholder="例: 広告宣伝費">
+          </div>
+          <button class="btn primary" id="addSubject" type="button">科目を追加</button>
+          <div class="settings-list" id="settingsSubjectList"></div>
+        </section>
+
+        <section class="panel summary">
+          <h2 class="section-title">適用（相手方）設定</h2>
+          <div class="field">
+            <label for="settingsSubjectForPayee">科目</label>
+            <select id="settingsSubjectForPayee"></select>
+          </div>
+          <div class="field">
+            <label for="newPayeeName">追加する相手方</label>
+            <input id="newPayeeName" type="text" placeholder="例: 新しい取引先">
+          </div>
+          <button class="btn primary" id="addPayee" type="button">相手方を追加</button>
+          <div class="settings-list" id="settingsPayeeList"></div>
+        </section>
+      </div>
+      <div class="notice" id="settingsNotice" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="cloud-config.js"></script>
+  <script>
+    const storageKey = "simple-ledger-v2";
+    const oldStorageKey = "simple-ledger-v1";
+    const settingsStorageKey = "simple-ledger-settings-v1";
+    const cloudSettingsId = "rocos-flow-settings";
+    const cloudDataId = "rocos-flow-main";
+    const yen = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY" });
+    let cloudClient = null;
+    let cloudSettingsReady = false;
+    let cloudSettingsTimer = null;
+    let cloudDataTimer = null;
+
+    const labels = {
+      business: "事業会計",
+      welfare: "福祉会計",
+      income: "収入",
+      expense: "経費"
+    };
+
+    const defaultSubjects = {
+      business: {
+        income: ["弁当売上", "バリ取り報酬", "その他事業収入"],
+        expense: ["仕入材料", "消耗材料", "車両費", "消耗品", "光熱水道＆通信費", "雑費等その他"]
+      },
+      welfare: {
+        income: ["保険請求収入", "その他福祉収入"],
+        expense: ["地代家賃", "会議費", "諸会費", "交通費（職員）", "保険料", "その他雑費"]
+      }
+    };
+
+    const defaultPayees = {
+      "仕入材料": ["業務スーパー", "Aプライス", "イオン", "マルアイ", "JA", "ダイレックス", "コープ", "鳥勝商店", "ナチュラルファーム", "神戸肉推進機構（株）", "西原商会", "喜多農機", "丸大青果", "たかみくらファーム"],
+      "消耗材料": ["山陽プラスティック", "モダンパック"],
+      "車両費": ["ENEOS", "KYGNUS", "JASS", "コスモ石油", "出光"],
+      "消耗品": ["キリン堂", "Seria", "ZAGZAG", "サンドラッグ", "ダイソー", "welcia"],
+      "雑費等その他": ["若松産業"],
+      "バリ取り報酬": ["井上化成"]
+    };
+
+    let subjects = loadSettingsPart("subjects", defaultSubjects);
+    let payees = loadSettingsPart("payees", defaultPayees);
+
+    const initialEntries = [
+      { id: crypto.randomUUID(), date: "2026-05-02", domain: "business", flow: "income", subject: "弁当売上", payee: "弁当レジ", amount: 85000, taxRate: "10", memo: "サンプル" },
+      { id: crypto.randomUUID(), date: "2026-05-05", domain: "welfare", flow: "income", subject: "保険請求収入", payee: "国保連", amount: 42000, taxRate: "10", memo: "サンプル" },
+      { id: crypto.randomUUID(), date: "2026-05-07", domain: "business", flow: "expense", subject: "仕入材料", payee: "業務スーパー", amount: 12800, taxRate: "8", memo: "サンプル" },
+      { id: crypto.randomUUID(), date: "2026-05-12", domain: "business", flow: "expense", subject: "利用者工賃", payee: "ROCO'S WORKS", amount: 24000, taxRate: "10", memo: "自動反映サンプル" }
+    ];
+
+    let entries = loadEntries();
+    let activeDomain = "business";
+    let activeReportDomain = "business";
+
+    const form = document.getElementById("entryForm");
+    const entryId = document.getElementById("entryId");
+    const date = document.getElementById("date");
+    const amount = document.getElementById("amount");
+    const domain = document.getElementById("domain");
+    const flow = document.getElementById("flow");
+    const subject = document.getElementById("subject");
+    const payee = document.getElementById("payee");
+    const customPayee = document.getElementById("customPayee");
+    const customPayeeField = document.getElementById("customPayeeField");
+    const taxRate = document.getElementById("taxRate");
+    const memo = document.getElementById("memo");
+    const saveButton = document.getElementById("saveButton");
+    const notice = document.getElementById("notice");
+    const monthFilter = document.getElementById("monthFilter");
+    const flowFilter = document.getElementById("flowFilter");
+    const subjectFilter = document.getElementById("subjectFilter");
+    const summaryGrid = document.getElementById("summaryGrid");
+    const subjectSummary = document.getElementById("subjectSummary");
+    const books = document.getElementById("books");
+    const ledgerPage = document.getElementById("ledgerPage");
+    const sharePage = document.getElementById("sharePage");
+    const settingsPage = document.getElementById("settingsPage");
+    const reportPageButton = document.getElementById("reportPageButton");
+    const settingsPageButton = document.getElementById("settingsPageButton");
+    const reportMonth = document.getElementById("reportMonth");
+    const taxAccountantEmail = document.getElementById("taxAccountantEmail");
+    const reportMemo = document.getElementById("reportMemo");
+    const reportPeriod = document.getElementById("reportPeriod");
+    const reportCreated = document.getElementById("reportCreated");
+    const reportSummary = document.getElementById("reportSummary");
+    const reportTable = document.getElementById("reportTable");
+    const shareText = document.getElementById("shareText");
+    const settingsDomain = document.getElementById("settingsDomain");
+    const settingsFlow = document.getElementById("settingsFlow");
+    const newSubjectName = document.getElementById("newSubjectName");
+    const settingsSubjectList = document.getElementById("settingsSubjectList");
+    const settingsSubjectForPayee = document.getElementById("settingsSubjectForPayee");
+    const newPayeeName = document.getElementById("newPayeeName");
+    const settingsPayeeList = document.getElementById("settingsPayeeList");
+    const settingsNotice = document.getElementById("settingsNotice");
+    const cloudSettingsStatus = document.getElementById("cloudSettingsStatus");
+
+    date.valueAsDate = new Date();
+    updateSubjectOptions();
+    updateSubjectFilterOptions();
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const cleanAmount = Number(amount.value);
+      const payeeValue = selectedPayeeValue();
+      if (!date.value || !subject.value || !payeeValue || !Number.isFinite(cleanAmount) || cleanAmount <= 0) {
+        showNotice("日付・種類・科目・適用（相手方）・金額を確認してください。");
+        return;
+      }
+
+      const next = {
+        id: entryId.value || crypto.randomUUID(),
+        date: date.value,
+        domain: domain.value,
+        flow: flow.value,
+        subject: subject.value,
+        payee: payeeValue,
+        amount: Math.round(cleanAmount),
+        taxRate: taxRate.value,
+        memo: memo.value.trim()
+      };
+
+      if (entryId.value) {
+        entries = entries.map((entry) => entry.id === entryId.value ? next : entry);
+        showNotice("明細を更新しました。");
+      } else {
+        entries = [...entries, next];
+        showNotice("明細を追加しました。");
+      }
+
+      save();
+      clearForm();
+      render();
+    });
+
+    document.querySelectorAll("[data-domain-page]").forEach((button) => {
+      button.addEventListener("click", () => switchPage(button.dataset.domainPage));
+    });
+    document.querySelectorAll("[data-report-domain]").forEach((button) => {
+      button.addEventListener("click", () => switchReportDomain(button.dataset.reportDomain));
+    });
+    reportPageButton.addEventListener("click", showReportPage);
+    settingsPageButton.addEventListener("click", showSettingsPage);
+    settingsDomain.addEventListener("change", renderSettings);
+    settingsFlow.addEventListener("change", renderSettings);
+    settingsSubjectForPayee.addEventListener("change", renderSettingsPayees);
+    document.getElementById("addSubject").addEventListener("click", addSubject);
+    document.getElementById("addPayee").addEventListener("click", addPayee);
+    document.getElementById("exportSettings").addEventListener("click", exportSettings);
+    document.getElementById("importSettings").addEventListener("change", importSettings);
+    reportMonth.addEventListener("change", renderReport);
+    reportMemo.addEventListener("input", renderReport);
+    document.getElementById("printReport").addEventListener("click", () => window.print());
+    document.getElementById("emailReport").addEventListener("click", emailReport);
+    document.getElementById("copyLineText").addEventListener("click", copyLineText);
+    document.getElementById("exportReportCsv").addEventListener("click", exportReportCsv);
+    flow.addEventListener("change", updateSubjectOptions);
+    subject.addEventListener("change", () => updatePayeeOptions());
+    payee.addEventListener("change", updateCustomPayeeVisibility);
+    document.getElementById("resetForm").addEventListener("click", clearForm);
+    monthFilter.addEventListener("change", render);
+    flowFilter.addEventListener("change", () => {
+      updateSubjectFilterOptions();
+      render();
+    });
+    subjectFilter.addEventListener("change", render);
+    document.getElementById("exportCsv").addEventListener("click", exportCsv);
+    document.getElementById("exportJson").addEventListener("click", exportJson);
+    document.getElementById("importJson").addEventListener("change", importJson);
+    document.getElementById("importSales").addEventListener("click", () => {
+      showNotice("弁当レジアプリのデータ形式が分かれば、自動取込をつなげられます。");
+    });
+    document.getElementById("importWages").addEventListener("click", () => {
+      showNotice("ROCO'S WORKSのCSV/API形式が分かれば、利用者工賃を自動取込できます。");
+    });
+
+    function loadEntries() {
+      const saved = localStorage.getItem(storageKey) || localStorage.getItem(oldStorageKey);
+      if (!saved) return initialEntries;
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.map(normalizeEntry) : initialEntries;
+      } catch {
+        return initialEntries;
+      }
+    }
+
+    function loadSettingsPart(key, fallback) {
+      const saved = localStorage.getItem(settingsStorageKey);
+      if (!saved) return clone(fallback);
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed[key] ? parsed[key] : clone(fallback);
+      } catch {
+        return clone(fallback);
+      }
+    }
+
+    function saveSettings() {
+      localStorage.setItem(settingsStorageKey, JSON.stringify({ subjects, payees }));
+      scheduleCloudSettingsSave();
+      scheduleCloudFlowSave();
+    }
+
+    function cloudConfigReady() {
+      return Boolean(
+        window.ROCO_CLOUD_CONFIG &&
+        window.ROCO_CLOUD_CONFIG.supabaseUrl &&
+        window.ROCO_CLOUD_CONFIG.supabaseAnonKey &&
+        window.supabase
+      );
+    }
+
+    function setupCloudSettings() {
+      if (!cloudConfigReady()) {
+        updateCloudSettingsStatus("設定はこのパソコンに保存中");
+        return false;
+      }
+      try {
+        cloudClient = window.supabase.createClient(
+          window.ROCO_CLOUD_CONFIG.supabaseUrl,
+          window.ROCO_CLOUD_CONFIG.supabaseAnonKey
+        );
+        cloudSettingsReady = true;
+        updateCloudSettingsStatus("共有設定を確認中");
+        return true;
+      } catch {
+        cloudSettingsReady = false;
+        updateCloudSettingsStatus("設定はこのパソコンに保存中");
+        return false;
+      }
+    }
+
+    function settingsSnapshot() {
+      return {
+        app: "ROCO'S Flow",
+        type: "settings",
+        version: 2,
+        subjects,
+        payees,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function flowSnapshot() {
+      return {
+        app: "ROCO'S Flow",
+        type: "ledger",
+        version: 1,
+        entries,
+        subjects,
+        payees,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function applyCloudFlow(data) {
+      if (!data) return false;
+      if (Array.isArray(data.entries)) {
+        entries = data.entries.map(normalizeEntry).filter((entry) => entry.date && entry.subject && Number.isFinite(entry.amount));
+        localStorage.setItem(storageKey, JSON.stringify(entries));
+      }
+      if (data.subjects && data.payees) {
+        subjects = data.subjects;
+        payees = data.payees;
+        localStorage.setItem(settingsStorageKey, JSON.stringify({ subjects, payees }));
+      }
+      updateSubjectOptions(subject.value);
+      updateSubjectFilterOptions();
+      renderSettings();
+      return true;
+    }
+
+    async function syncFlowFromCloud() {
+      if (!setupCloudSettings() || !cloudClient) return false;
+      try {
+        const { data, error } = await cloudClient
+          .from("register_state")
+          .select("data")
+          .eq("id", cloudDataId)
+          .single();
+        if (error || !data || !data.data) {
+          await saveCloudFlowNow();
+          return false;
+        }
+        if (applyCloudFlow(data.data)) {
+          updateCloudSettingsStatus("経費帳をクラウド共有中");
+          return true;
+        }
+      } catch (error) {
+        console.error("ROCO'S Flow cloud load error", error);
+        updateCloudSettingsStatus("経費帳の共有につながりません");
+      }
+      return false;
+    }
+
+    async function saveCloudFlowNow() {
+      if (!cloudSettingsReady || !cloudClient) return false;
+      try {
+        const { error } = await cloudClient
+          .from("register_state")
+          .upsert({
+            id: cloudDataId,
+            data: flowSnapshot(),
+            updated_at: new Date().toISOString()
+          });
+        if (error) {
+          console.error("ROCO'S Flow cloud save error", error);
+          updateCloudSettingsStatus(`経費帳を保存できません: ${error.message || error.code || "通信エラー"}`);
+          return false;
+        }
+        updateCloudSettingsStatus("経費帳をクラウド共有中");
+        return true;
+      } catch (error) {
+        console.error("ROCO'S Flow cloud save error", error);
+        updateCloudSettingsStatus(`経費帳を保存できません: ${error.message || "通信エラー"}`);
+        return false;
+      }
+    }
+
+    function scheduleCloudFlowSave() {
+      if (!cloudSettingsReady) return;
+      window.clearTimeout(cloudDataTimer);
+      cloudDataTimer = window.setTimeout(saveCloudFlowNow, 300);
+    }
+
+    function applyCloudSettings(data) {
+      if (!data || !data.subjects || !data.payees) return false;
+      subjects = data.subjects;
+      payees = data.payees;
+      localStorage.setItem(settingsStorageKey, JSON.stringify({ subjects, payees }));
+      updateSubjectOptions(subject.value);
+      updateSubjectFilterOptions();
+      renderSettings();
+      render();
+      return true;
+    }
+
+    async function syncSettingsFromCloud() {
+      if (!setupCloudSettings() || !cloudClient) return;
+      try {
+        const { data, error } = await cloudClient
+          .from("register_state")
+          .select("data")
+          .eq("id", cloudSettingsId)
+          .single();
+        if (error || !data || !data.data) {
+          await saveCloudSettingsNow();
+          return;
+        }
+        if (applyCloudSettings(data.data)) {
+          updateCloudSettingsStatus("科目設定を共有中");
+        }
+      } catch {
+        updateCloudSettingsStatus("共有設定につながりません");
+      }
+    }
+
+    async function saveCloudSettingsNow() {
+      if (!cloudSettingsReady || !cloudClient) return false;
+      try {
+        const { error } = await cloudClient
+          .from("register_state")
+          .upsert({
+            id: cloudSettingsId,
+            data: settingsSnapshot(),
+            updated_at: new Date().toISOString()
+          });
+        if (error) {
+          console.error("ROCO'S Flow shared settings save error", error);
+          updateCloudSettingsStatus(`共有設定を保存できません: ${error.message || error.code || "通信エラー"}`);
+        } else {
+          updateCloudSettingsStatus("科目設定を共有中");
+        }
+        return !error;
+      } catch (error) {
+        console.error("ROCO'S Flow shared settings save error", error);
+        updateCloudSettingsStatus(`共有設定を保存できません: ${error.message || "通信エラー"}`);
+        return false;
+      }
+    }
+
+    function scheduleCloudSettingsSave() {
+      if (!cloudSettingsReady) return;
+      window.clearTimeout(cloudSettingsTimer);
+      cloudSettingsTimer = window.setTimeout(saveCloudSettingsNow, 300);
+    }
+
+    function updateCloudSettingsStatus(message) {
+      if (cloudSettingsStatus) cloudSettingsStatus.textContent = message;
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function normalizeEntry(entry) {
+      const domainValue = entry.domain === "welfare" ? "welfare" : "business";
+      const flowValue = entry.flow === "expense" ? "expense" : "income";
+      return {
+        id: entry.id || crypto.randomUUID(),
+        date: entry.date,
+        domain: domainValue,
+        flow: flowValue,
+        subject: entry.subject || defaultSubject(domainValue, flowValue),
+        payee: entry.payee || "",
+        amount: Number(entry.amount),
+        taxRate: String(entry.taxRate || "10"),
+        memo: entry.memo || ""
+      };
+    }
+
+    function save() {
+      localStorage.setItem(storageKey, JSON.stringify(entries));
+      scheduleCloudFlowSave();
+    }
+
+    function clearForm() {
+      entryId.value = "";
+      form.reset();
+      domain.value = activeDomain;
+      date.valueAsDate = new Date();
+      taxRate.value = "10";
+      saveButton.textContent = "追加する";
+      updateSubjectOptions();
+      updatePayeeOptions();
+    }
+
+    function showNotice(message) {
+      notice.textContent = message;
+      window.setTimeout(() => {
+        if (notice.textContent === message) notice.textContent = "";
+      }, 3200);
+    }
+
+    function switchPage(nextDomain) {
+      activeDomain = nextDomain === "welfare" ? "welfare" : "business";
+      ledgerPage.classList.remove("hidden");
+      sharePage.classList.add("hidden");
+      settingsPage.classList.add("hidden");
+      reportPageButton.classList.remove("active");
+      settingsPageButton.classList.remove("active");
+      domain.value = activeDomain;
+      document.querySelectorAll("[data-domain-page]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.domainPage === activeDomain);
+      });
+      clearForm();
+      updateSubjectFilterOptions();
+      render();
+    }
+
+    function showReportPage() {
+      ledgerPage.classList.add("hidden");
+      sharePage.classList.remove("hidden");
+      settingsPage.classList.add("hidden");
+      document.querySelectorAll("[data-domain-page]").forEach((button) => button.classList.remove("active"));
+      reportPageButton.classList.add("active");
+      settingsPageButton.classList.remove("active");
+      renderReportOptions();
+      renderReport();
+    }
+
+    function showSettingsPage() {
+      ledgerPage.classList.add("hidden");
+      sharePage.classList.add("hidden");
+      settingsPage.classList.remove("hidden");
+      document.querySelectorAll("[data-domain-page]").forEach((button) => button.classList.remove("active"));
+      reportPageButton.classList.remove("active");
+      settingsPageButton.classList.add("active");
+      renderSettings();
+    }
+
+    function switchReportDomain(nextDomain) {
+      activeReportDomain = nextDomain === "welfare" ? "welfare" : "business";
+      document.querySelectorAll("[data-report-domain]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.reportDomain === activeReportDomain);
+      });
+      renderReportOptions();
+      renderReport();
+    }
+
+    function updateSubjectOptions(selectedValue = "") {
+      const list = subjects[domain.value][flow.value];
+      subject.innerHTML = list.map((name) => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join("");
+      subject.value = list.includes(selectedValue) ? selectedValue : list[0];
+      updatePayeeOptions();
+    }
+
+    function updatePayeeOptions(selectedValue = "") {
+      const list = payees[subject.value] || [];
+      payee.innerHTML = `<option value="">選択なし</option>${list.map((name) => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join("")}`;
+      if (selectedValue && list.includes(selectedValue)) {
+        payee.value = selectedValue;
+        customPayee.value = "";
+      } else if (selectedValue && !list.includes(selectedValue)) {
+        payee.value = "";
+        customPayee.value = selectedValue;
+      } else {
+        payee.value = list[0] || "";
+        customPayee.value = "";
+      }
+      updateCustomPayeeVisibility();
+    }
+
+    function updateCustomPayeeVisibility() {
+      customPayee.placeholder = payee.value ? "選択肢にない場合だけ入力" : "相手方を直接入力";
+    }
+
+    function selectedPayeeValue() {
+      return customPayee.value.trim() || payee.value;
+    }
+
+    function updateSubjectFilterOptions() {
+      const current = subjectFilter.value || "all";
+      const list = allSubjects()
+        .filter((row) => row.domain === activeDomain)
+        .filter((row) => flowFilter.value === "all" || row.flow === flowFilter.value);
+      subjectFilter.innerHTML = `<option value="all">すべて</option>${list.map((row) => `<option value="${escapeAttr(row.name)}">${escapeHtml(row.name)}</option>`).join("")}`;
+      subjectFilter.value = list.some((row) => row.name === current) || current === "all" ? current : "all";
+    }
+
+    function filteredEntries() {
+      return entries
+        .filter((entry) => monthFilter.value === "all" || monthKey(entry.date) === monthFilter.value)
+        .filter((entry) => entry.domain === activeDomain)
+        .filter((entry) => flowFilter.value === "all" || entry.flow === flowFilter.value)
+        .filter((entry) => subjectFilter.value === "all" || entry.subject === subjectFilter.value)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.domain.localeCompare(b.domain) || a.flow.localeCompare(b.flow) || a.subject.localeCompare(b.subject));
+    }
+
+    function monthKey(value) {
+      return value.slice(0, 7);
+    }
+
+    function renderMonthOptions() {
+      const current = monthFilter.value || "all";
+      const months = [...new Set(entries.filter((entry) => entry.domain === activeDomain).map((entry) => monthKey(entry.date)))].sort().reverse();
+      monthFilter.innerHTML = `<option value="all">すべての月</option>${months.map((month) => `<option value="${month}">${formatMonth(month)}</option>`).join("")}`;
+      monthFilter.value = months.includes(current) || current === "all" ? current : "all";
+    }
+
+    function render() {
+      renderMonthOptions();
+      const visible = filteredEntries();
+      renderSummary(visible);
+      renderSubjectSummary(visible);
+      renderBooks(visible);
+      renderReportOptions();
+      renderReport();
+      renderSettings();
+    }
+
+    function renderSummary(rows) {
+      const totals = rows.reduce((sum, entry) => {
+        sum[entry.flow] = (sum[entry.flow] || 0) + entry.amount;
+        return sum;
+      }, {});
+      const income = totals.income || 0;
+      const expense = totals.expense || 0;
+      const net = income - expense;
+      const pageLabel = labels[activeDomain].replace("会計", "");
+
+      summaryGrid.innerHTML = [
+        metric(`${pageLabel}収入`, income, activeDomain),
+        metric(`${pageLabel}経費`, expense, "expense"),
+        metric(`${pageLabel}差引`, net, "net"),
+        metric("明細件数", `${rows.length}件`, activeDomain)
+      ].join("");
+    }
+
+    function metric(label, value, className) {
+      const displayValue = typeof value === "number" ? yen.format(value) : value;
+      return `<div class="metric ${className}"><span>${label}</span><strong>${displayValue}</strong></div>`;
+    }
+
+    function renderSubjectSummary(rows) {
+      const sections = [
+        [activeDomain, "income"],
+        [activeDomain, "expense"]
+      ];
+
+      subjectSummary.innerHTML = sections.map(([domainValue, flowValue]) => {
+        const baseList = subjects[domainValue][flowValue];
+        const extraList = [...new Set(rows
+          .filter((entry) => entry.domain === domainValue && entry.flow === flowValue)
+          .map((entry) => entry.subject)
+          .filter((name) => !baseList.includes(name)))];
+        const list = [...baseList, ...extraList];
+        const rowsHtml = list.map((name) => {
+          const total = rows
+            .filter((entry) => entry.domain === domainValue && entry.flow === flowValue && entry.subject === name)
+            .reduce((sum, entry) => sum + entry.amount, 0);
+          return `<div class="subject-row"><span>${escapeHtml(name)}</span><strong>${yen.format(total)}</strong></div>`;
+        }).join("");
+        return `<div class="subject-card"><h3>${labels[domainValue]} ${labels[flowValue]}</h3>${rowsHtml}</div>`;
+      }).join("");
+    }
+
+    function renderBooks(rows) {
+      if (!rows.length) {
+        books.innerHTML = `<div class="empty">表示できる明細がありません。</div>`;
+        return;
+      }
+
+      const groups = rows.reduce((map, entry) => {
+        const key = monthKey(entry.date);
+        if (!map[key]) map[key] = [];
+        map[key].push(entry);
+        return map;
+      }, {});
+
+      books.innerHTML = Object.keys(groups).sort().reverse().map((month) => {
+        const monthRows = groups[month].sort((a, b) => a.date.localeCompare(b.date));
+        const income = monthRows.filter((entry) => entry.flow === "income").reduce((sum, entry) => sum + entry.amount, 0);
+        const expense = monthRows.filter((entry) => entry.flow === "expense").reduce((sum, entry) => sum + entry.amount, 0);
+        return `
+          <div class="month-block">
+            <div class="month-head">
+              <h3>${formatMonth(month)}</h3>
+              <div class="month-total">収入 ${yen.format(income)} / 経費 ${yen.format(expense)} / 差引 ${yen.format(income - expense)}</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 112px;">日付</th>
+                    <th style="width: 120px;">会計</th>
+                    <th style="width: 150px;">科目</th>
+                    <th style="width: 170px;">適用（相手方）</th>
+                    <th style="width: 92px;" class="num">消費税</th>
+                    <th style="width: 160px;" class="num">収入</th>
+                    <th style="width: 160px;" class="num">経費</th>
+                    <th>メモ</th>
+                    <th style="width: 86px;" class="num">操作</th>
+                  </tr>
+                </thead>
+                <tbody>${monthRows.map(rowTemplate).join("")}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function rowTemplate(entry) {
+      const tagClass = `${entry.domain}-${entry.flow}`;
+      return `
+        <tr>
+          <td>${formatDate(entry.date)}</td>
+          <td><span class="tag ${tagClass}">${labels[entry.domain]}${labels[entry.flow]}</span></td>
+          <td>${escapeHtml(entry.subject)}</td>
+          <td>${escapeHtml(entry.payee || "")}</td>
+          <td class="num">${escapeHtml(entry.taxRate || "10")}%</td>
+          <td class="num">${entry.flow === "income" ? yen.format(entry.amount) : ""}</td>
+          <td class="num">${entry.flow === "expense" ? yen.format(entry.amount) : ""}</td>
+          <td>${escapeHtml(entry.memo || "")}</td>
+          <td>
+            <div class="row-actions">
+              <button class="icon-btn" type="button" title="編集" aria-label="編集" onclick="editEntry('${entry.id}')">✎</button>
+              <button class="icon-btn" type="button" title="削除" aria-label="削除" onclick="deleteEntry('${entry.id}')">×</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function formatMonth(month) {
+      const [year, monthNumber] = month.split("-");
+      return `${year}年${Number(monthNumber)}月`;
+    }
+
+    function formatDate(value) {
+      const [, monthNumber, day] = value.split("-");
+      return `${Number(monthNumber)}/${Number(day)}`;
+    }
+
+    function editEntry(id) {
+      const entry = entries.find((row) => row.id === id);
+      if (!entry) return;
+      entryId.value = entry.id;
+      date.value = entry.date;
+      amount.value = entry.amount;
+      domain.value = entry.domain;
+      activeDomain = entry.domain;
+      document.querySelectorAll("[data-domain-page]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.domainPage === activeDomain);
+      });
+      flow.value = entry.flow;
+      updateSubjectOptions(entry.subject);
+      updatePayeeOptions(entry.payee || "");
+      taxRate.value = String(entry.taxRate || "10");
+      memo.value = entry.memo;
+      saveButton.textContent = "更新する";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteEntry(id) {
+      const entry = entries.find((row) => row.id === id);
+      if (!entry) return;
+      if (!confirm(`${entry.subject} ${entry.payee || ""} を削除しますか？`)) return;
+      entries = entries.filter((row) => row.id !== id);
+      save();
+      render();
+      showNotice("明細を削除しました。");
+    }
+
+    function exportCsv() {
+      const rows = filteredEntries();
+      const header = ["日付", "会計", "種類", "科目", "適用（相手方）", "消費税", "収入", "経費", "メモ"];
+      const body = rows.map((entry) => [
+        entry.date,
+        labels[entry.domain],
+        labels[entry.flow],
+        entry.subject,
+        entry.payee || "",
+        `${entry.taxRate || "10"}%`,
+        entry.flow === "income" ? entry.amount : "",
+        entry.flow === "expense" ? entry.amount : "",
+        entry.memo
+      ]);
+      download(`経費帳_${todayText()}.csv`, toCsv([header, ...body]), "text/csv;charset=utf-8");
+    }
+
+    function reportRows() {
+      return entries
+        .filter((entry) => entry.domain === activeReportDomain)
+        .filter((entry) => reportMonth.value === "all" || monthKey(entry.date) === reportMonth.value)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.domain.localeCompare(b.domain) || a.flow.localeCompare(b.flow) || a.subject.localeCompare(b.subject));
+    }
+
+    function renderReportOptions() {
+      const current = reportMonth.value || "all";
+      const months = [...new Set(entries.filter((entry) => entry.domain === activeReportDomain).map((entry) => monthKey(entry.date)))].sort().reverse();
+      reportMonth.innerHTML = `<option value="all">すべての月</option>${months.map((month) => `<option value="${month}">${formatMonth(month)}</option>`).join("")}`;
+      reportMonth.value = months.includes(current) || current === "all" ? current : "all";
+    }
+
+    function renderReport() {
+      if (!reportMonth) return;
+      const rows = reportRows();
+      const totals = rows.reduce((sum, entry) => {
+        const key = `${entry.domain}-${entry.flow}`;
+        sum[key] = (sum[key] || 0) + entry.amount;
+        return sum;
+      }, {});
+      const income = totals[`${activeReportDomain}-income`] || 0;
+      const expense = totals[`${activeReportDomain}-expense`] || 0;
+      const pageLabel = labels[activeReportDomain];
+      reportPeriod.textContent = `${pageLabel} / ${reportMonth.value === "all" ? "対象: すべての月" : `対象: ${formatMonth(reportMonth.value)}`}`;
+      reportCreated.textContent = `作成日: ${todayText()}`;
+      reportSummary.innerHTML = [
+        metric(`${pageLabel} 収入`, income, activeReportDomain),
+        metric(`${pageLabel} 経費`, expense, "expense"),
+        metric(`${pageLabel} 差引`, income - expense, "net"),
+        metric("明細件数", `${rows.length}件`, activeReportDomain)
+      ].join("");
+      renderReportTable(rows);
+      shareText.value = buildShareText(rows, income, expense);
+    }
+
+    function renderReportTable(rows) {
+      if (!rows.length) {
+        reportTable.innerHTML = `<div class="empty">提出できる明細がありません。</div>`;
+        return;
+      }
+      reportTable.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 100px;">日付</th>
+                <th style="width: 110px;">会計</th>
+                <th style="width: 90px;">種類</th>
+                <th style="width: 150px;">科目</th>
+                <th>適用（相手方）</th>
+                <th style="width: 78px;" class="num">税率</th>
+                <th style="width: 130px;" class="num">収入</th>
+                <th style="width: 130px;" class="num">経費</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((entry) => `
+                <tr>
+                  <td>${escapeHtml(entry.date)}</td>
+                  <td>${labels[entry.domain]}</td>
+                  <td>${labels[entry.flow]}</td>
+                  <td>${escapeHtml(entry.subject)}</td>
+                  <td>${escapeHtml(entry.payee || "")}</td>
+                  <td class="num">${escapeHtml(entry.taxRate || "10")}%</td>
+                  <td class="num">${entry.flow === "income" ? yen.format(entry.amount) : ""}</td>
+                  <td class="num">${entry.flow === "expense" ? yen.format(entry.amount) : ""}</td>
+                  <td>${escapeHtml(entry.memo || "")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function buildShareText(rows, income, expense) {
+      const period = reportMonth.value === "all" ? "すべての月" : formatMonth(reportMonth.value);
+      const memoText = reportMemo.value.trim();
+      const pageLabel = labels[activeReportDomain];
+      return [
+        "ROCO'S Flow 経費帳データ",
+        `会計: ${pageLabel}`,
+        `対象: ${period}`,
+        `作成日: ${todayText()}`,
+        `収入: ${yen.format(income)}`,
+        `経費: ${yen.format(expense)}`,
+        `差引: ${yen.format(income - expense)}`,
+        `明細件数: ${rows.length}件`,
+        memoText ? `メモ: ${memoText}` : "",
+        "CSVまたは印刷ページもあわせて確認お願いします。"
+      ].filter(Boolean).join("\n");
+    }
+
+    function emailReport() {
+      const subjectText = encodeURIComponent(`ROCO'S Flow ${labels[activeReportDomain]} 経費帳データ ${reportMonth.value === "all" ? "全期間" : formatMonth(reportMonth.value)}`);
+      const bodyText = encodeURIComponent(`${shareText.value}\n\n提出用CSVは画面の「提出用CSV出力」から保存して添付してください。`);
+      const to = encodeURIComponent(taxAccountantEmail.value.trim());
+      window.location.href = `mailto:${to}?subject=${subjectText}&body=${bodyText}`;
+    }
+
+    async function copyLineText() {
+      try {
+        await navigator.clipboard.writeText(shareText.value);
+        showNotice("LINE用テキストをコピーしました。LINEに貼り付けて送れます。");
+      } catch {
+        shareText.select();
+        document.execCommand("copy");
+        showNotice("LINE用テキストをコピーしました。");
+      }
+    }
+
+    function exportReportCsv() {
+      const rows = reportRows();
+      const header = ["日付", "会計", "種類", "科目", "適用（相手方）", "消費税", "収入", "経費", "メモ"];
+      const body = rows.map((entry) => [
+        entry.date,
+        labels[entry.domain],
+        labels[entry.flow],
+        entry.subject,
+        entry.payee || "",
+        `${entry.taxRate || "10"}%`,
+        entry.flow === "income" ? entry.amount : "",
+        entry.flow === "expense" ? entry.amount : "",
+        entry.memo
+      ]);
+      const period = reportMonth.value === "all" ? "全期間" : reportMonth.value;
+      download(`税理士提出用_${labels[activeReportDomain]}_${period}_${todayText()}.csv`, toCsv([header, ...body]), "text/csv;charset=utf-8");
+    }
+
+    function renderSettings() {
+      if (!settingsPage) return;
+      const list = subjects[settingsDomain.value][settingsFlow.value];
+      settingsSubjectList.innerHTML = list.map((name) => `
+        <div class="settings-row">
+          <strong>${escapeHtml(name)}</strong>
+          <button class="btn" type="button" onclick="renameSubject('${encodeURIComponent(name)}')">名前変更</button>
+          <button class="btn danger" type="button" onclick="deleteSubject('${encodeURIComponent(name)}')">削除</button>
+        </div>
+      `).join("");
+      renderSettingsSubjectOptions();
+      renderSettingsPayees();
+    }
+
+    function renderSettingsSubjectOptions() {
+      const current = settingsSubjectForPayee.value;
+      const options = allSubjects().map((row) => row.name);
+      const unique = [...new Set(options)];
+      settingsSubjectForPayee.innerHTML = unique.map((name) => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join("");
+      settingsSubjectForPayee.value = unique.includes(current) ? current : unique[0] || "";
+    }
+
+    function renderSettingsPayees() {
+      const selectedSubject = settingsSubjectForPayee.value;
+      const list = payees[selectedSubject] || [];
+      settingsPayeeList.innerHTML = list.length ? list.map((name) => `
+        <div class="settings-row">
+          <strong>${escapeHtml(name)}</strong>
+          <button class="btn" type="button" onclick="renamePayee('${encodeURIComponent(selectedSubject)}','${encodeURIComponent(name)}')">名前変更</button>
+          <button class="btn danger" type="button" onclick="deletePayee('${encodeURIComponent(selectedSubject)}','${encodeURIComponent(name)}')">削除</button>
+        </div>
+      `).join("") : `<div class="empty">相手方はまだ登録されていません。入力画面では直接入力できます。</div>`;
+    }
+
+    function addSubject() {
+      const name = newSubjectName.value.trim();
+      if (!name) {
+        showSettingsNotice("追加する科目名を入力してください。");
+        return;
+      }
+      const list = subjects[settingsDomain.value][settingsFlow.value];
+      if (list.includes(name)) {
+        showSettingsNotice("同じ科目がすでにあります。");
+        return;
+      }
+      list.push(name);
+      if (!payees[name]) payees[name] = [];
+      newSubjectName.value = "";
+      persistSettingsAndRefresh("科目を追加しました。");
+    }
+
+    function renameSubject(oldName) {
+      oldName = decodeURIComponent(oldName);
+      const nextName = prompt("新しい科目名を入力してください。", oldName);
+      if (!nextName || !nextName.trim() || nextName.trim() === oldName) return;
+      const cleanName = nextName.trim();
+      if (allSubjects().some((row) => row.name === cleanName)) {
+        showSettingsNotice("同じ科目名がすでにあります。");
+        return;
+      }
+      Object.keys(subjects).forEach((domainKey) => {
+        Object.keys(subjects[domainKey]).forEach((flowKey) => {
+          subjects[domainKey][flowKey] = subjects[domainKey][flowKey].map((name) => name === oldName ? cleanName : name);
+        });
+      });
+      if (payees[oldName]) {
+        payees[cleanName] = payees[oldName];
+        delete payees[oldName];
+      }
+      entries = entries.map((entry) => entry.subject === oldName ? { ...entry, subject: cleanName } : entry);
+      save();
+      persistSettingsAndRefresh("科目名を変更しました。");
+    }
+
+    function deleteSubject(name) {
+      name = decodeURIComponent(name);
+      const list = subjects[settingsDomain.value][settingsFlow.value];
+      if (list.length <= 1) {
+        showSettingsNotice("最後の科目は削除できません。");
+        return;
+      }
+      if (!confirm(`${name} を科目の選択肢から削除しますか？過去の明細は残ります。`)) return;
+      subjects[settingsDomain.value][settingsFlow.value] = list.filter((item) => item !== name);
+      persistSettingsAndRefresh("科目を削除しました。");
+    }
+
+    function addPayee() {
+      const subjectName = settingsSubjectForPayee.value;
+      const name = newPayeeName.value.trim();
+      if (!subjectName || !name) {
+        showSettingsNotice("科目と追加する相手方を確認してください。");
+        return;
+      }
+      if (!payees[subjectName]) payees[subjectName] = [];
+      if (payees[subjectName].includes(name)) {
+        showSettingsNotice("同じ相手方がすでにあります。");
+        return;
+      }
+      payees[subjectName].push(name);
+      newPayeeName.value = "";
+      persistSettingsAndRefresh("相手方を追加しました。");
+    }
+
+    function renamePayee(subjectName, oldName) {
+      subjectName = decodeURIComponent(subjectName);
+      oldName = decodeURIComponent(oldName);
+      const nextName = prompt("新しい相手方名を入力してください。", oldName);
+      if (!nextName || !nextName.trim() || nextName.trim() === oldName) return;
+      const cleanName = nextName.trim();
+      if ((payees[subjectName] || []).includes(cleanName)) {
+        showSettingsNotice("同じ相手方がすでにあります。");
+        return;
+      }
+      payees[subjectName] = (payees[subjectName] || []).map((name) => name === oldName ? cleanName : name);
+      entries = entries.map((entry) => entry.subject === subjectName && entry.payee === oldName ? { ...entry, payee: cleanName } : entry);
+      save();
+      persistSettingsAndRefresh("相手方名を変更しました。");
+    }
+
+    function deletePayee(subjectName, name) {
+      subjectName = decodeURIComponent(subjectName);
+      name = decodeURIComponent(name);
+      if (!confirm(`${name} を相手方の選択肢から削除しますか？過去の明細は残ります。`)) return;
+      payees[subjectName] = (payees[subjectName] || []).filter((item) => item !== name);
+      persistSettingsAndRefresh("相手方を削除しました。");
+    }
+
+    function persistSettingsAndRefresh(message) {
+      saveSettings();
+      updateSubjectOptions(subject.value);
+      updateSubjectFilterOptions();
+      render();
+      showSettingsNotice(message);
+    }
+
+    function showSettingsNotice(message) {
+      settingsNotice.textContent = message;
+      notice.textContent = message;
+      window.setTimeout(() => {
+        if (settingsNotice.textContent === message) settingsNotice.textContent = "";
+        if (notice.textContent === message) notice.textContent = "";
+      }, 2800);
+    }
+
+    function exportSettings() {
+      const data = {
+        app: "ROCO'S Flow",
+        type: "settings",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        subjects,
+        payees
+      };
+      download(`ROCOS_Flow_設定_${todayText()}.json`, JSON.stringify(data, null, 2), "application/json");
+      showSettingsNotice("設定バックアップを保存しました。");
+    }
+
+    function importSettings(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!parsed.subjects || !parsed.payees) throw new Error("invalid");
+          subjects = parsed.subjects;
+          payees = parsed.payees;
+          saveSettings();
+          updateSubjectOptions();
+          updateSubjectFilterOptions();
+          render();
+          showSettingsNotice("設定を復元しました。");
+        } catch {
+          showSettingsNotice("設定を復元できませんでした。ファイルを確認してください。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportJson() {
+      download(`経費帳バックアップ_${todayText()}.json`, JSON.stringify(entries, null, 2), "application/json");
+    }
+
+    function importJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!Array.isArray(parsed)) throw new Error("invalid");
+          entries = parsed.map(normalizeEntry).filter((entry) => entry.date && entry.subject && Number.isFinite(entry.amount));
+          save();
+          updateSubjectFilterOptions();
+          render();
+          showNotice("バックアップを復元しました。");
+        } catch {
+          showNotice("復元できませんでした。ファイルを確認してください。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function allSubjects() {
+      return Object.keys(subjects).flatMap((domainValue) =>
+        Object.keys(subjects[domainValue]).flatMap((flowValue) =>
+          subjects[domainValue][flowValue].map((name) => ({ domain: domainValue, flow: flowValue, name }))
+        )
+      );
+    }
+
+    function defaultSubject(domainValue, flowValue) {
+      return subjects[domainValue][flowValue][0];
+    }
+
+    function toCsv(rows) {
+      return "\ufeff" + rows.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
+    }
+
+    function download(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function todayText() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+
+    syncFlowFromCloud().then(async () => {
+      await syncSettingsFromCloud();
+      await saveCloudFlowNow();
+      render();
+    });
+  </script>
+</body>
+</html>
