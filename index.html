@@ -4,10 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ROCO'S Flow</title>
-  <meta name="theme-color" content="#2f6f5e">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
   <style>
     :root {
       --bg: #f6f7f4;
@@ -847,9 +843,7 @@
     document.getElementById("exportCsv").addEventListener("click", exportCsv);
     document.getElementById("exportJson").addEventListener("click", exportJson);
     document.getElementById("importJson").addEventListener("change", importJson);
-    document.getElementById("importSales").addEventListener("click", () => {
-      showNotice("弁当レジアプリのデータ形式が分かれば、自動取込をつなげられます。");
-    });
+    document.getElementById("importSales").addEventListener("click", importBentoSales);
     document.getElementById("importWages").addEventListener("click", () => {
       showNotice("ROCO'S WORKSのCSV/API形式が分かれば、利用者工賃を自動取込できます。");
     });
@@ -1095,6 +1089,101 @@
       scheduleCloudFlowSave();
     }
 
+    async function importBentoSales() {
+      const button = document.getElementById("importSales");
+      if (!setupCloudSettings() || !cloudClient) {
+        showNotice("クラウドに接続できないため、弁当売上を取り込めませんでした。");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "売上を確認中...";
+      try {
+        const { data, error } = await cloudClient
+          .from("register_state")
+          .select("data")
+          .eq("id", "main")
+          .single();
+
+        if (error) throw error;
+        const registerData = data && data.data ? data.data : {};
+        const sales = Array.isArray(registerData.sales) ? registerData.sales : [];
+        const deletedIds = new Set(Array.isArray(registerData.deletedSaleIds) ? registerData.deletedSaleIds : []);
+        const dailyTotals = new Map();
+
+        sales.forEach((sale) => {
+          if (!sale || deletedIds.has(sale.id)) return;
+          const saleDate = saleDateText(sale.at);
+          const saleTotal = Math.round(Number(sale.total));
+          if (!saleDate || !Number.isFinite(saleTotal) || saleTotal <= 0) return;
+          dailyTotals.set(saleDate, (dailyTotals.get(saleDate) || 0) + saleTotal);
+        });
+
+        if (!dailyTotals.size) {
+          showNotice("お弁当レジに取り込める売上が見つかりませんでした。");
+          return;
+        }
+
+        let addedCount = 0;
+        let updatedCount = 0;
+        const importedDates = new Set(dailyTotals.keys());
+        entries = entries.filter((entry) => {
+          const managed = String(entry.id || "").startsWith("bento-register-") || entry.memo === "弁当レジ売上取込（日別合計）";
+          return !managed || importedDates.has(entry.date);
+        });
+
+        [...dailyTotals.entries()].sort(([a], [b]) => a.localeCompare(b)).forEach(([saleDate, total]) => {
+          const stableId = `bento-register-${saleDate}`;
+          const existingIndex = entries.findIndex((entry) =>
+            entry.id === stableId ||
+            (entry.date === saleDate && entry.domain === "business" && entry.flow === "income" && entry.subject === "弁当売上" && entry.payee === "弁当レジ")
+          );
+          const previous = existingIndex >= 0 ? entries[existingIndex] : null;
+          const next = {
+            id: previous ? previous.id : stableId,
+            date: saleDate,
+            domain: "business",
+            flow: "income",
+            subject: "弁当売上",
+            payee: "弁当レジ",
+            amount: total,
+            taxRate: previous ? previous.taxRate : "10",
+            memo: "弁当レジ売上取込（日別合計）"
+          };
+          if (existingIndex >= 0) {
+            entries[existingIndex] = next;
+            updatedCount += 1;
+          } else {
+            entries.push(next);
+            addedCount += 1;
+          }
+        });
+
+        entries.sort((a, b) => a.date.localeCompare(b.date));
+        save();
+        const saved = await saveCloudFlowNow();
+        render();
+        const totalAmount = [...dailyTotals.values()].reduce((sum, value) => sum + value, 0);
+        showNotice(`${dailyTotals.size}日分・${yen.format(totalAmount)}を取り込みました（新規${addedCount}日、更新${updatedCount}日）${saved ? "" : "。このパソコンには保存済みです"}`);
+      } catch (error) {
+        console.error("Bento sales import error", error);
+        showNotice(`弁当売上を取り込めませんでした: ${error.message || "通信エラー"}`);
+      } finally {
+        button.disabled = false;
+        button.textContent = "弁当レジ売上取込";
+      }
+    }
+
+    function saleDateText(value) {
+      const direct = String(value || "").match(/^(\d{4}-\d{2}-\d{2})/);
+      if (direct) return direct[1];
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return "";
+      const year = parsed.getFullYear();
+      const month = String(parsed.getMonth() + 1).padStart(2, "0");
+      const day = String(parsed.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
     function clearForm() {
       entryId.value = "";
       form.reset();
