@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8">
@@ -1130,13 +1130,17 @@
 
         let addedCount = 0;
         let updatedCount = 0;
-        const importedDates = new Set(dailyTotals.keys());
-        entries = entries.filter((entry) => {
-          const managed = String(entry.id || "").startsWith("bento-register-") || entry.memo === "弁当レジ売上取込（日別合計）";
-          return !managed || importedDates.has(entry.date);
-        });
-
         [...dailyTotals.entries()].sort(([a], [b]) => a.localeCompare(b)).forEach(([saleDate, total]) => {
+          const recovered = entries.some((entry) =>
+            entry.date === saleDate &&
+            entry.domain === "business" &&
+            entry.flow === "income" &&
+            entry.subject === "弁当売上" &&
+            entry.payee === "弁当レジ" &&
+            String(entry.id || "").startsWith("bento-csv-recovery-")
+          );
+          if (recovered) return;
+
           const stableId = `bento-register-${saleDate}`;
           const existingIndex = entries.findIndex((entry) =>
             entry.id === stableId ||
