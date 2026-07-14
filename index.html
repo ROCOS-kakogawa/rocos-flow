@@ -932,6 +932,13 @@
       };
     }
 
+    function hasMojibakeEntries() {
+      const fields = ["subject", "payee", "type", "description", "source", "invoiceName", "memo", "note"];
+      return entries.some((entry) =>
+        fields.some((field) => typeof entry[field] === "string" && entry[field].includes("??"))
+      );
+    }
+
     function applyCloudFlow(data) {
       if (!data) return false;
       if (Array.isArray(data.entries)) {
@@ -974,6 +981,10 @@
 
     async function saveCloudFlowNow() {
       if (!cloudSettingsReady || !cloudClient) return false;
+      if (hasMojibakeEntries()) {
+        updateCloudSettingsStatus("文字化けした経費データがあるため、クラウド保存を止めました");
+        return false;
+      }
       try {
         const { error } = await cloudClient
           .from("register_state")
@@ -1888,3 +1899,4 @@
   </script>
 </body>
 </html>
+
